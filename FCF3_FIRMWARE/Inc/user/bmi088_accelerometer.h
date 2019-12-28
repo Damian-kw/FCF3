@@ -27,7 +27,7 @@ typedef void (*ptr_bmi088_accelerometer_read_byte)(uint8_t address,
 		uint8_t *buffer);
 typedef void (*ptr_bmi088_aceelerometer_write_byte)(uint8_t address,
 		uint8_t *buffer);
-bmi088_accelerometer bmi088_acceleromoter_create(
+bmi088_accelerometer bmi088_accelerometer_create(
 		ptr_bmi088_aceelerometer_write_byte write_byte,
 		ptr_bmi088_accelerometer_read_byte read_byte, accel_scale_t range,
 		accel_data_rate_t rate, accel_power_mode_t mode);

@@ -17,6 +17,7 @@
 #include "flight_controler.h"
 #include "ibus_receiver.h"
 #include "bmi088_gyroscope.h"
+#include "bmi088_accelerometer.h"
 #include "interface_implementation.h"
 #include "eeprom.h"
 #include "salloc.h"
@@ -42,12 +43,6 @@ typedef enum CHANNELS_ENUM {
 	MODE_CHANNEL = 5,
 
 } CHANNELS;
-static const float gyro_x_offset = -0.659;
-static const float gyro_y_offset = 0.654;
-static const float gyro_z_offset = -0.192;
-static const float accel_x_offset = 0.092;
-static const float accel_y_offset = 0.014;
-static const float accel_z_offset = 0.828;
 static const uint16_t FLIGHT_LOOP_FREQUENCY_HZ = 1000;
 //flight controler objects
 static sMedianFilter_t median_filter;
@@ -55,6 +50,7 @@ static sMedianNode_t median_buffer[MEDIAN_FILTER_ELEMENTS];
 volatile static ibus_receiver radio_receiver;
 static uart debug_uart;
 static bmi088_gyroscope gyroscope;
+static bmi088_accelerometer accelerometer;
 static esc esc1;
 static esc esc2;
 static esc esc3;
@@ -165,8 +161,14 @@ void flight_controler_init() {
 		error_handler();
 	}
 	salloc_enable();
+	accelerometer = bmi088_accelerometer_create(accelerometer_write_byte,
+			accelerometer_read_byte, ACCEL_RANGE_3G, ACCEL_ODR_400, ACC_ACTIVE);
+	if (accelerometer) {
+		error_handler();
+	}
 	gyroscope = bmi088_gyroscope_create(gyroscope_write_byte,
-			gyroscope_read_byte,GYRO_RANGE_1000,GYRO_ODR_1000_BW_116,GYRO_NORMAL);
+			gyroscope_read_byte, GYRO_RANGE_1000, GYRO_ODR_1000_BW_116,
+			GYRO_NORMAL);
 	if (!gyroscope) {
 		error_handler();
 	}
@@ -225,6 +227,9 @@ void flight_controler_init() {
 	}
 	start_pwm();
 	start_adc();
+	HAL_Delay(5000);
+	bmi088_accelerometer_calibrate(accelerometer);
+	bmi088_gyroscope_calibrate(gyroscope);
 	flight_controler_set_state(FLYING);
 	HAL_Delay(2000);
 	uart_dma_get_byte();
@@ -251,17 +256,17 @@ void flight_controler_run() {
 		flight_controler_write_to_esc();
 		break;
 	}
-	char *states_str[] = { "FLYING", "GET_MPU_DATA", "UPDATE_IMU",
-			"CALCULATE_PIDS", "WRITE_TO_ESC", "GET_CPPM_FRAME",
-			"COLLECT_CPPM_DATA" };
-//	flight_controler_write_to_uart(states_str[flight_controler_get_state()]);
-//	flight_controler_write_to_uart("\n");
-//	HAL_Delay(5);
-
 }
 
 static void flight_controler_get_mpu_data() {
-
+	bmi088_gyroscope_collect_data(gyroscope);
+	bmi088_accelerometer_collect_data(accelerometer);
+	gyro_x = bmi088_gyroscope_get_x(gyroscope);
+	gyro_y = bmi088_gyroscope_get_y(gyroscope);
+	gyro_z = bmi088_gyroscope_get_z(gyroscope);
+	accel_x = bmi088_accelerometer_get_x(accelerometer);
+	accel_y = bmi088_accelerometer_get_y(accelerometer);
+	accel_z = bmi088_accelerometer_get_z(accelerometer);
 	flight_controler_set_state(UPDATE_IMU);
 }
 static void flight_controler_get_ibus_frame() {

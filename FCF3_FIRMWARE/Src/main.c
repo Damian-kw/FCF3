@@ -30,14 +30,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "flight_controler.h"
-#include "interface_implementation.h"
-#include "bmi088_gyroscope.h"
-#include "bmi088_accelerometer.h"
-#include <stdio.h>
-#include <string.h>
-#include "salloc.h"
-#include "conversion.h"
-#include "eeprom.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,25 +97,11 @@ int main(void) {
 	MX_TIM3_Init();
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
-	//flight_controler_init();
-	salloc_enable();
-	gyro = bmi088_gyroscope_create(gyroscope_write_byte, gyroscope_read_byte,
-			GYRO_RANGE_1000, GYRO_ODR_1000_BW_116, GYRO_NORMAL);
-	accel = bmi088_acceleromoter_create(accelerometer_write_byte,
-			accelerometer_read_byte, ACCEL_RANGE_6G, ACCEL_ODR_400, ACC_ACTIVE);
+	flight_controler_init();
 
-	bmi088_gyroscope_calibrate(gyro);
 	while (1) {
-		char* newline = "\r\n";
-		bmi088_gyroscope_collect_data(gyro);
-		float x = bmi088_gyroscope_get_x(gyro);
-		float y = bmi088_gyroscope_get_y(gyro);
-		float z = bmi088_gyroscope_get_z(gyro);
-		char msg[10];
-	//	sprintf(msg, "%.2f\r\n", x);
-		//HAL_UART_Transmit(&huart2, msg, 10, HAL_MAX_DELAY);
 
-		HAL_Delay(50);
+		flight_controler_run();
 	}
 	/* USER CODE END 2 */
 
