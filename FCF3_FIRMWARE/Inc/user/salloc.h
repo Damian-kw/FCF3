@@ -7,4 +7,5 @@ void *salloc(uint32_t size);
 void salloc_enable();
 void salloc_disable();
 uint32_t salloc_get_used_memory();
+void salloc_clear_buffer();
 #endif // _SALLOC_H
