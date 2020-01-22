@@ -29,12 +29,17 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "interface_implementation.h"
+#include "salloc.h"
+#include "bmi088_accelerometer.h"
+#include "bmi088_gyroscope.h"
 #include "flight_controler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+bmi088_accelerometer accel;
+bmi088_gyroscope gyro;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,8 +54,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-bmi088_gyroscope gyro;
-bmi088_accelerometer accel;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,11 +100,27 @@ int main(void) {
 	MX_TIM3_Init();
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
-	flight_controler_init();
+	salloc_enable();
+	gyro = bmi088_gyroscope_create(gyroscope_write_byte, gyroscope_read_byte,
+				GYRO_RANGE_1000, GYRO_ODR_1000_BW_116, GYRO_NORMAL);
+		if (!gyro) {
+			error_handler();
+		}
+		uint8_t byte=2;
+		data_eeprom_write_byte(0x10,byte);
+		byte=0;
+		byte=data_eeprom_read_byte(0x10);
+		uart_dma_get_byte();
+		asm("nop");
+
+//	accel = bmi088_accelerometer_create(accelerometer_write_byte,
+	//		accelerometer_read_byte, ACCEL_RANGE_3G, ACCEL_ODR_400, ACC_ACTIVE);
+
+	//flight_controler_init();
 
 	while (1) {
 
-		flight_controler_run();
+		//flight_controler_run();
 	}
 	/* USER CODE END 2 */
 

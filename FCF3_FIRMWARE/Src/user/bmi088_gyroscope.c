@@ -1,4 +1,4 @@
-#include "bmi088_gyroscope.h"
+ #include "bmi088_gyroscope.h"
 #include <stdio.h>
 #include <stdlib.h>
 static const float RANGE_125_LSB = 262.144f;

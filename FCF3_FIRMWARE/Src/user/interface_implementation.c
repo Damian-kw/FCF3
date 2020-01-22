@@ -60,7 +60,7 @@ void esc4_write_pulse(uint32_t pulse) {
 }
 void data_eeprom_write_byte(uint32_t address, uint8_t byte) {
 	HAL_StatusTypeDef st = HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDRESS, address,
-			sizeof(uint8_t), &byte, sizeof(uint8_t), HAL_MAX_DELAY);
+			sizeof(uint8_t), &byte, sizeof(uint8_t), 100);
 	if (st != HAL_OK) {
 		Error_Handler();
 	}
@@ -71,7 +71,7 @@ uint8_t data_eeprom_read_byte(uint8_t address) {
 	uint8_t byte = 0;
 	HAL_StatusTypeDef st;
 	st = HAL_I2C_Mem_Read(&hi2c1, EEPROM_ADDRESS, address, sizeof(uint8_t),
-			&byte, sizeof(uint8_t), HAL_MAX_DELAY);
+			&byte, sizeof(uint8_t), 100);
 	if (st != HAL_OK) {
 		Error_Handler();
 	}
@@ -84,28 +84,28 @@ uint32_t battery_adc_get_voltage() {
 }
 void gyroscope_write_byte(uint8_t address, uint8_t *byte) {
 	HAL_StatusTypeDef st = HAL_I2C_Mem_Write(&hi2c1, GYROSCOPE_ADDRESS, address,
-			1, byte, 1, HAL_MAX_DELAY);
+			1, byte, 1, 1000);
 	if (st != HAL_OK) {
 		error_handler();
 	}
 }
 void gyroscope_read_byte(uint8_t address, uint8_t *byte) {
 	HAL_StatusTypeDef st = HAL_I2C_Mem_Read(&hi2c1, GYROSCOPE_ADDRESS, address,
-			1, byte, 1, HAL_MAX_DELAY);
+			1, byte, 1, 1000);
 	if (st != HAL_OK) {
 		error_handler();
 	}
 }
 void accelerometer_write_byte(uint8_t address, uint8_t *byte) {
-	HAL_StatusTypeDef st = HAL_I2C_Mem_Write(&hi2c1, ACCELEROMETER_ADDRESS, address, 1, byte,
-			1, HAL_MAX_DELAY);
+	HAL_StatusTypeDef st = HAL_I2C_Mem_Write(&hi2c1, ACCELEROMETER_ADDRESS,
+			address, 1, byte, 1, HAL_MAX_DELAY);
 	if (st != HAL_OK) {
 		error_handler();
 	}
 }
 void accelerometer_read_byte(uint8_t address, uint8_t *byte) {
-	HAL_StatusTypeDef st = HAL_I2C_Mem_Read(&hi2c1, ACCELEROMETER_ADDRESS, address,
-			1, byte, 1, HAL_MAX_DELAY);
+	HAL_StatusTypeDef st = HAL_I2C_Mem_Read(&hi2c1, ACCELEROMETER_ADDRESS,
+			address, 1, byte, 1, HAL_MAX_DELAY);
 	if (st != HAL_OK) {
 		error_handler();
 	}
