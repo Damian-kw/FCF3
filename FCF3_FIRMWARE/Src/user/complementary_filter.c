@@ -13,7 +13,7 @@ static float compute_second_gain(float firts_gain);
 complementary_filter complementary_filter_ctor()
 {
     complementary_filter me;
-    me = malloc(sizeof(complementary_filter_t));
+    me = (complementary_filter) malloc(sizeof(complementary_filter_t));
     if (!me)
     {
        return NULL;
